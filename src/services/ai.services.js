@@ -1,9 +1,9 @@
-const { GoogleGenAI } = require("@google/genai");
+const { GoogleGenAI } = require('@google/genai');
 const { config } = require("dotenv");
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-async function generateCaption() {
+async function generateCaption(base64ImageFile) {
   const contents = [
     {
       inlineData: {
@@ -15,7 +15,7 @@ async function generateCaption() {
   ];
 
   const response = await ai.models.generateContent({
-    model: "gemini-3.5-flash",
+    model: "gemini-3.1-flash-lite",
     contents: contents,
     config : {
         systemInstructions : `

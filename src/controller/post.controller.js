@@ -1,40 +1,41 @@
-const postModel = require('../model/post.model')
-const {uploadImage} = require('../services/storage.service')
-const {generateCaption} = require('../services/ai.services')
-const { v4 : uuidv4} = require('uuid')
+const postModel = require("../model/post.model");
+const { uploadImage } = require("../services/storage.service");
+const { generateCaption } = require("../services/ai.services");
+const { v4: uuidv4 } = require("uuid");
 
-const createPostController = async (req , res ) => {
-    const imageFile = req.body;
+const createPostController = async (req, res) => {
+  const imageFile = req.file;
 
-    if(!imageFile){
-        res.status(400).json({
-            success : false,
-            message : "Image file required"
-        })
-    }
-    console.log("Imagefile : ", imageFile)
+  if (!imageFile) {
+    return res.status(400).json({
+      success: false,
+      message: "Image file required",
+    });
+  }
 
-    const base64ImageFile = imageFile.buffer.toString('base64')
+//   console.log("Imagefile : ", imageFile);
 
-    const caption = await generateCaption(base64ImageFile)
+  const base64ImageFile = imageFile.buffer.toString("base64");
+//   console.log("Base64ImageFile : ", base64ImageFile); 
 
-    const result = await uploadImage(imageFile.buffer, `${uuidv4()}`)
+  const caption = await generateCaption(base64ImageFile);
 
-    const post = await postModel.create({
-        image : result.url,
-        caption : caption,
-        user : req.user._id
-    })
+  const result = await uploadImage(imageFile.buffer, `${uuidv4()}`);
 
-    res.status(201).json({
-        success : true,
-        message : "Post created successfully",
-        data : {
-            caption : caption,
-            image : result.url
-        }
-    })
+  const post = await postModel.create({
+    image: result.url,
+    caption: caption,
+    user: req.user._id,
+  });
 
-}
+  res.status(201).json({
+    success: true,
+    message: "Post created successfully",
+    data: {
+      caption: caption,
+      image: result.url,
+    },
+  });
+};
 
-module.exports = {createPostController}
+module.exports = { createPostController };
